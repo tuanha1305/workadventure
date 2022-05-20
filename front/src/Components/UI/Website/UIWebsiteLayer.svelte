@@ -24,6 +24,7 @@
                   uiWebsite.margin.left ? uiWebsite.margin.left : "O"
               }`
             : "0";
+        uiWebsite.canOverlapPlayer ? iframe.classList.remove("screen-blocker") : iframe.classList.add("screen-blocker");
     }
 
     onMount(() => {
