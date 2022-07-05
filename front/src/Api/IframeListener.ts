@@ -30,13 +30,16 @@ import type { WasCameraUpdatedEvent } from "./Events/WasCameraUpdatedEvent";
 import type { ChangeAreaEvent } from "./Events/ChangeAreaEvent";
 import { CameraSetEvent } from "./Events/CameraSetEvent";
 import { CameraFollowPlayerEvent } from "./Events/CameraFollowPlayerEvent";
-import type { RemotePlayerClickedEvent } from "./Events/RemotePlayerClickedEvent";
 import { AddActionsMenuKeyToRemotePlayerEvent } from "./Events/AddActionsMenuKeyToRemotePlayerEvent";
 import type { ActionsMenuActionClickedEvent } from "./Events/ActionsMenuActionClickedEvent";
 import { RemoveActionsMenuKeyFromRemotePlayerEvent } from "./Events/RemoveActionsMenuKeyFromRemotePlayerEvent";
 import { SetAreaPropertyEvent } from "./Events/SetAreaPropertyEvent";
-import { ModifyUIWebsiteEvent } from "./Events/ui/UIWebsite";
+import { ModifyUIWebsiteEvent } from "./Events/Ui/UIWebsite";
 import { ModifyAreaEvent } from "./Events/CreateAreaEvent";
+import { RemotePlayer } from "../Phaser/Entity/RemotePlayer";
+import { JoinProximityMeetingEvent } from "./Events/ProximityMeeting/JoinProximityMeetingEvent";
+import { ParticipantProximityMeetingEvent } from "./Events/ProximityMeeting/ParticipantProximityMeetingEvent";
+import { RemotePlayerInitializer } from "./Types/Initializers/RemotePlayerInitializer";
 
 type AnswererCallback<T extends keyof IframeQueryMap> = (
     query: IframeQueryMap[T]["query"],
@@ -452,6 +455,56 @@ class IframeListener {
         );
     }
 
+    sendJoinProximityMeetingEvent(users: RemotePlayer[]) {
+        const usersSerialized = users.map((user) => {
+            return {
+                userId: user.userId,
+                userUuid: user.userUuid,
+                name: user.playerName,
+            };
+        });
+
+        this.postMessage({
+            type: "joinProximityMeetingEvent",
+            data: {
+                users: usersSerialized,
+            } as JoinProximityMeetingEvent,
+        });
+    }
+
+    sendParticipantJoinProximityMeetingEvent(user: RemotePlayer) {
+        this.postMessage({
+            type: "participantJoinProximityMeetingEvent",
+            data: {
+                user: {
+                    userId: user.userId,
+                    userUuid: user.userUuid,
+                    name: user.playerName,
+                },
+            } as ParticipantProximityMeetingEvent,
+        });
+    }
+
+    sendParticipantLeaveProximityMeetingEvent(user: RemotePlayer) {
+        this.postMessage({
+            type: "participantLeaveProximityMeetingEvent",
+            data: {
+                user: {
+                    userId: user.userId,
+                    userUuid: user.userUuid,
+                    name: user.playerName,
+                },
+            } as ParticipantProximityMeetingEvent,
+        });
+    }
+
+    sendLeaveProximityMeetingEvent() {
+        this.postMessage({
+            type: "leaveProximityMeetingEvent",
+            data: undefined,
+        });
+    }
+
     sendEnterEvent(name: string) {
         this.postMessage({
             type: "enterEvent",
@@ -515,7 +568,7 @@ class IframeListener {
         }
     }
 
-    sendRemotePlayerClickedEvent(event: RemotePlayerClickedEvent) {
+    sendRemotePlayerClickedEvent(event: RemotePlayerInitializer) {
         this.postMessage({
             type: "remotePlayerClickedEvent",
             data: event,
