@@ -316,6 +316,13 @@ export class UIWebsite {
 export class UIWebsiteCommands extends IframeApiContribution<UIWebsiteCommands> {
     callbacks = [];
 
+    /**
+     * Open a website an promise to return a UIWebsite instance.
+     * {@link https://workadventu.re/map-building/api-ui.md#display-a-ui-website | Website documentation}
+     *
+     * @param {CreateUIWebsiteEvent} createUIWebsite Object who represent the informations needs to create the UIWebsite
+     * @returns {Promise<UIWebsite>} Promise to return a UIWebsite
+     */
     async open(createUIWebsite: CreateUIWebsiteEvent): Promise<UIWebsite> {
         const result = await queryWorkadventure({
             type: "openUIWebsite",
@@ -325,6 +332,12 @@ export class UIWebsiteCommands extends IframeApiContribution<UIWebsiteCommands> 
         return new UIWebsite(result);
     }
 
+    /**
+     * You can get all UI websites.
+     * {@link https://workadventu.re/map-building/api-ui.md#get-all-ui-websites | Website documentation}
+     *
+     * @returns {Promise<UIWebsite[]>} Promise to return all UI websites
+     */
     async getAll(): Promise<UIWebsite[]> {
         const result = await queryWorkadventure({
             type: "getUIWebsites",
